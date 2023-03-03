@@ -14,6 +14,7 @@ GITHUB_REPO=$1
 BINARY=$2
 DEBUG=$3
 LOCAL_PATH=~/.local/bin
+RELEASE_URL=https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/latest 
 
 cat << "EOM" 
 ┃┃┃┃┃┃┃┃┃┃┃┃┏┓┃┃┃┃┓┃┃┃┃┃┃┏┓┃┃┃┃┃┃
@@ -45,19 +46,19 @@ enable_debug() {
         wget_args="-v"
     else
         curl_args="-s"
-        wget_args="-nv"
+        wget_args="-q"
     fi
 }
 
 validate_args() {
     # Check for first argument, should be a valid github repository name
-    if [[ -z $1 ]]; then
+    if [[ -z $GITHUB_REPO ]]; then
         fail "No repository provided"
         exit 1
     fi
 
     # check for second argument, this will be the name of the program
-    if [[ -z $2 ]]; then
+    if [[ -z $BINARY ]]; then
         fail "No binary name provided"
         exit 1
     fi
@@ -65,7 +66,7 @@ validate_args() {
 
 install() {
     info "Fetching binary from github.com/${GITHUB_USER}/${GITHUB_REPO}..."
-    download_linux=$(curl $curl_args https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/latest \
+    download_linux=$(curl $curl_args $RELEASE_URL \
         | grep "browser_download_url.*amd64"  \
         | cut -d : -f 2,3 \
         | tr -d \" \
