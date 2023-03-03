@@ -3,15 +3,28 @@
 BLUE="34"
 YELLOW="33"
 MAGENTA="35"
+RED="31"
 BOLDBLUE="\e[1;${BLUE}m"
 BOLDYELLOW="\e[1;${YELLOW}m"
 BOLDMAGENTA="\e[1;${MAGENTA}m"
+BOLDRED="\e[1;${RED}m"
 ENDCOLOR="\e[0m"
 
 GITHUB_USER=thesandybridge
 GITHUB_REPO=$1
 BINARY=$2
 LOCAL_PATH=~/.local/bin
+
+if [[ -z $1 ]]; then
+    echo -e "${BOLDRED}[E]${ENDCOLOR} No repository provided"
+    exit 1
+fi
+
+
+if [[ -z $2 ]]; then
+    echo -e "${BOLDRED}[E]${ENDCOLOR} No binary name provided"
+    exit 1
+fi
 
 echo -e "${BOLDBLUE}[+]${ENDCOLOR} Downloading file from github.com/${GITHUB_USER}/${GITHUB_REPO}..."
 
