@@ -10,7 +10,7 @@ ENDCOLOR="\e[0m"
 
 GITHUB_USER=thesandybridge
 GITHUB_REPO=$1
-BINARY=cypher
+BINARY=$2
 LOCAL_PATH=~/.local/bin
 
 echo -e "${BOLDBLUE}[+]${ENDCOLOR} Downloading file from github.com/${GITHUB_USER}/${GITHUB_REPO}..."
