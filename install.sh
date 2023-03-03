@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 GITHUB_USER=thesandybridge
-GITHUB_REPO=$2
+GITHUB_REPO=$1
 BINARY=cypher
 LOCAL_PATH=~/.local/bin
 
