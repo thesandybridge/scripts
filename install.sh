@@ -24,7 +24,7 @@ GITHUB_USER=thesandybridge
 GITHUB_REPO=$1
 BINARY=$2
 DEBUG=$3
-LOCAL_PATH=/usr/local/bin
+LOCAL_PATH=$HOME/.local/bin
 RELEASE_URL=https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/latest 
 
 cat << "EOM" 
