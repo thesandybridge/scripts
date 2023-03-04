@@ -58,6 +58,7 @@ check_local_dir() {
     if [[ ! -d "$LOCAL_PATH" ]]; then
         mkdir -p $LOCAL_PATH
         debug "$LOCAL_PATH not found, attempting to create..."
+        warn "Manually add $LOCAL_PATH to \$PATH"
         success "Created $LOCAL_PATH directory"
     else
         debug "$LOCAL_PATH found, continuing..."
