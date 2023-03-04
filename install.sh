@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
+# thesandybridge's binary installer.
+# 
+# This script is used to fetch the latest release page from a repository,
+# it then filters out the ame64 binary and uses wget to install it to the machine.
+#
+# The location of the binary should be in ~/.local/bin and it will first check
+# to see if path exists, creating it if it doesn't.
+#
+# This script does not add it to the $PATH variable, so the user will need to
+# manually add it.
 
 set -e
 
+# DEFINE VARIABLES
 grey="\\e[37m"
 blue="\\e[36m"
 red="\\e[31m"
