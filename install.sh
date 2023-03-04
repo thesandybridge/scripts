@@ -30,6 +30,11 @@ https://github.com/thesandybridge
 ---------------------------------
 EOM
 
+function shutdown() {
+  tput cnorm # reset cursor
+}
+trap shutdown EXIT
+
 # Logging, loosely based on http://www.ludovicocaldara.net/dba/bash-tips-4-use-logging-levels/
 info() { echo -e "${blue}[+] $*${reset}"; }
 warn() { echo -e "${yellow}[!] $*${reset}"; }
@@ -50,6 +55,30 @@ enable_debug() {
         curl_args="-s"
         wget_args="-q"
     fi
+}
+
+spinner() {
+    # make sure we use non-unicode character type locale 
+    # (that way it works for any locale as long as the font supports the characters)
+    local LC_CTYPE=C
+
+    local pid=$1 # Process Id of the previous running command
+    local sp='-\|/'
+    local width=1
+
+    local i=0
+    tput civis # cursor invisible
+    info "$2"
+    while kill -0 $pid 2>/dev/null; do
+        local i=$(((i + $width) % ${#sp}))
+        printf "${blue}%s${reset}" "[${sp:$i:$width}]"
+
+        echo -en "\033[$1D"
+        sleep .1
+    done
+    tput cnorm
+    wait $pid # capture exit code
+    return $? 
 }
 
 check_local_dir() {
@@ -84,18 +113,22 @@ validate_args() {
 }
 
 install() {
-    info "Fetching binary from github.com/${GITHUB_USER}/${GITHUB_REPO}..."
-    download_linux=$(curl $curl_args $RELEASE_URL \
+    debug "Fetching binary from github.com/${GITHUB_USER}/${GITHUB_REPO}..."
+    get_url=$(curl $curl_args $RELEASE_URL \
         | grep "browser_download_url.*amd64"  \
         | cut -d : -f 2,3 \
         | tr -d \" \
-        | xargs)
+        | xargs > /tmp/_out ) &
+    spinner $! "Fetching binary from github.com/${GITHUB_USER}/${GITHUB_REPO}..."
+    download_url=$(</tmp/_out)
 
-    info "Downloading binary..."
-    wget $wget_args $download_linux -O $LOCAL_PATH/$BINARY
+    debug "Fetching binary from $download_linux"
+    wget $wget_args $download_url -O $LOCAL_PATH/$BINARY &
+    spinner $! "Downloading binary..."
 
-    info "Creating executable..."
-    chmod +x $LOCAL_PATH/$BINARY
+    debug "Creating executable at $LOCAL_PATH"
+    chmod +x $LOCAL_PATH/$BINARY &
+    spinner $! "Creating executable..."
 
     success "Success! Binary has been added to $LOCAL_PATH"
 }
