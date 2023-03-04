@@ -13,7 +13,7 @@ GITHUB_USER=thesandybridge
 GITHUB_REPO=$1
 BINARY=$2
 DEBUG=$3
-LOCAL_PATH=~/.local/bin
+LOCAL_PATH=$HOME/bin
 RELEASE_URL=https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/latest 
 
 cat << "EOM" 
@@ -55,10 +55,10 @@ enable_debug() {
 check_local_dir() {
     info "Checking for $LOCAL_PATH"
 
-    if [[ ! -d "~/.local/bin" ]]; then
-        mkdir -p ~/.local/bin
+    if [[ ! -d "$LOCAL_PATH" ]]; then
+        mkdir -p $LOCAL_PATH
         debug "$LOCAL_PATH not found, attempting to create..."
-        success "Created ~/.local/bin directory"
+        success "Created $LOCAL_PATH directory"
     else
         debug "$LOCAL_PATH found, continuing..."
     fi
