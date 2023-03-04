@@ -40,8 +40,8 @@ info() { echo -e "${blue}[+] $*${reset}"; }
 warn() { echo -e "${yellow}[!] $*${reset}"; }
 error() { echo -e "${red}[E] $*${reset}"; }
 debug() { if [[ "${DEBUG}" == "true" ]]; then echo -e "${grey}[D] $*${reset}"; fi }
-success() { echo -e "${green}✔ $*${reset}"; }
-fail() { echo -e "${red}✖ $*${reset}"; }
+success() { echo -e "${green}[✔] $*${reset}"; }
+fail() { echo -e "${red}[🞨] $*${reset}"; }
 
 curl_args=
 wget_args=
