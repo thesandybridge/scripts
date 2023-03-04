@@ -52,6 +52,15 @@ enable_debug() {
     fi
 }
 
+check_local_dir() {
+    info "Checking for $LOCAL_PATH"
+
+    if [[ ! -d "~/.local/bin" ]]; then
+        mkdir -p ~/.local/bin
+        warn "Created ~/.local/bin directory"
+    fi
+}
+
 validate_args() {
     # Check for first argument, should be a valid github repository name
     if [[ -z $GITHUB_REPO ]]; then
@@ -83,6 +92,7 @@ install() {
     success "Success! Binary has been added to $LOCAL_PATH"
 }
 
+check_local_dir
 enable_debug
 validate_args
 install
