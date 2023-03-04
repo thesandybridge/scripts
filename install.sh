@@ -57,19 +57,26 @@ check_local_dir() {
 
     if [[ ! -d "~/.local/bin" ]]; then
         mkdir -p ~/.local/bin
-        warn "Created ~/.local/bin directory"
+        debug "$LOCAL_PATH not found, attempting to create..."
+        success "Created ~/.local/bin directory"
+    else
+        debug "$LOCAL_PATH found, continuing..."
     fi
 }
 
 validate_args() {
     # Check for first argument, should be a valid github repository name
+    debug "Checking for script arguments."
+
     if [[ -z $GITHUB_REPO ]]; then
+        debug "Missing first argument."
         fail "No repository provided"
         exit 1
     fi
 
     # check for second argument, this will be the name of the program
     if [[ -z $BINARY ]]; then
+        debug "Missing second argument."
         fail "No binary name provided"
         exit 1
     fi
