@@ -105,10 +105,17 @@ check_local_dir() {
 
     info "Checking if $LOCAL_PATH is in PATH"
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+
         debug "Adding $LOCAL_PATH to \$PATH"
         echo 'export PATH=$PATH:$HOME/.local/bin' >> ~/.bashrc
         debug "Sourcing .bashrc..."
         source ~/.bashrc
+
+        if ! grep -q 'export PATH="$PATH"' ~/.bashrc; then
+            echo 'export PATH="$PATH"' >> ~/.bashrc
+            echo 'Added export PATH="$PATH" to ~/.bashrc'
+        fi
+
     fi
 }
 
