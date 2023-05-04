@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # thesandybridge's binary installer.
-# 
+#
 # This script is used to fetch the latest release page from a repository,
 # it then filters out the ame64 binary and uses wget to install it to the machine.
 #
@@ -25,9 +25,9 @@ GITHUB_REPO=$1
 BINARY=$2
 DEBUG=$3
 LOCAL_PATH=$HOME/.local/bin
-RELEASE_URL=https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/latest 
+RELEASE_URL=https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/latest
 
-cat << "EOM" 
+cat << "EOM"
 ┃┃┃┃┃┃┃┃┃┃┃┃┏┓┃┃┃┃┓┃┃┃┃┃┃┏┓┃┃┃┃┃┃
 ┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃┃
 ┏━━┓━━┓┃━┓┃━┛┃┓┃┏┓┗━┓━┓┓━┛┃━━┓━━┓
@@ -69,7 +69,7 @@ enable_debug() {
 }
 
 spinner() {
-    # make sure we use non-unicode character type locale 
+    # make sure we use non-unicode character type locale
     # (that way it works for any locale as long as the font supports the characters)
     local LC_CTYPE=C
 
@@ -89,7 +89,7 @@ spinner() {
     done
     tput cnorm
     wait $pid # capture exit code
-    return $? 
+    return $?
 }
 
 check_local_dir() {
@@ -98,10 +98,17 @@ check_local_dir() {
     if [[ ! -d "$LOCAL_PATH" ]]; then
         mkdir -p $LOCAL_PATH
         debug "$LOCAL_PATH not found, attempting to create..."
-        warn "Manually add $LOCAL_PATH to \$PATH"
         success "Created $LOCAL_PATH directory"
     else
         debug "$LOCAL_PATH found, continuing..."
+    fi
+
+    info "Checking if $LOCAL_PATH is in PATH"
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+        debug "Adding $LOCAL_PATH to \$PATH"
+        echo 'export PATH=$PATH:$HOME/.local/bin' >> ~/.bashrc
+        debug "Sourcing .bashrc..."
+        source ~/.bashrc
     fi
 }
 
