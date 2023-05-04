@@ -151,7 +151,7 @@ install() {
     success "Success! Binary has been added to $LOCAL_PATH"
 }
 
-check_local_dir
 enable_debug
+check_local_dir
 validate_args
 install
