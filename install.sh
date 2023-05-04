@@ -149,7 +149,6 @@ install() {
     spinner $! "Creating executable..."
 
     success "Success! Binary has been added to $LOCAL_PATH"
-    warn "You may need to add $LOCAL_PATH to your \$PATH"
 }
 
 check_local_dir
