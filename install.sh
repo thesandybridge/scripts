@@ -109,7 +109,6 @@ check_local_dir() {
         debug "Adding $LOCAL_PATH to \$PATH"
         echo 'export PATH=$PATH:$HOME/.local/bin' >> ~/.bashrc
         debug "Sourcing .bashrc..."
-        source ~/.bashrc
 
         if ! grep -q 'export PATH="$PATH"' ~/.bashrc; then
             echo 'export PATH="$PATH"' >> ~/.bashrc
@@ -162,3 +161,4 @@ enable_debug
 check_local_dir
 validate_args
 install
+source ~/.bashrc
