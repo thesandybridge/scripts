@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# DEFINE VARIABLES
+grey="\\e[37m"
+blue="\\e[36m"
+red="\\e[31m"
+yellow="\\e[33m"
+green="\\e[32m"
+reset="\\e[0m"
 
 spinner() {
     # make sure we use non-unicode character type locale
@@ -24,3 +31,10 @@ spinner() {
     wait $pid # capture exit code
     return $?
 }
+
+info() { echo -e "${blue}[+] $*${reset}"; }
+warn() { echo -e "${yellow}[!] $*${reset}"; }
+error() { echo -e "${red}[E] $*${reset}"; }
+debug() { if [[ "${DEBUG}" == "true" ]]; then echo -e "${grey}[D] $*${reset}"; fi }
+success() { echo -e "${green}[✔] $*${reset}"; }
+fail() { echo -e "${red}[🞨] $*${reset}"; }
