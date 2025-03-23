@@ -140,7 +140,6 @@ install() {
     platform="$(uname -s)"
     arch="$(uname -m)"
 
-    # Normalize platform name
     case "$platform" in
         Darwin)   platform="apple-darwin" ;;
         Linux)    platform="unknown-linux-gnu" ;;
@@ -148,48 +147,66 @@ install() {
         *)        fail "Unsupported platform: $platform"; exit 1 ;;
     esac
 
-    # Normalize arch name
     case "$arch" in
         x86_64|amd64) arch="x86_64" ;;
+        arm64|aarch64) arch="aarch64" ;;
         *) fail "Unsupported architecture: $arch"; exit 1 ;;
     esac
 
-    # Construct expected filename
     tarball="${BINARY}-${arch}-${platform}.tar.gz"
+    binary_legacy="${BINARY}_amd64"
 
-    info "Expecting asset name: $tarball"
+    info "Trying to find asset: $tarball"
 
-    debug "Fetching release metadata from $RELEASE_URL"
-    get_url=$(curl $curl_args "$RELEASE_URL" \
-        | grep "browser_download_url.*${tarball}" \
+    download_url=$(curl $curl_args "$RELEASE_URL" \
+        | grep "browser_download_url" \
+        | grep "$tarball" \
         | cut -d : -f 2,3 \
         | tr -d \" \
-        | xargs > /tmp/_out ) &
-    spinner $! "Resolving download URL for $tarball..."
-    download_url=$(</tmp/_out)
+        | xargs)
 
-    if [[ -z "$download_url" ]]; then
-        fail "Could not find a suitable binary for $platform/$arch"
+    if [[ -n "$download_url" ]]; then
+        tmp_dir=$(mktemp -d)
+        info "Downloading $tarball..."
+        wget $wget_args "$download_url" -O "$tmp_dir/$tarball" &
+        spinner $! "Downloading archive..."
+
+        info "Extracting $tarball..."
+        tar -xf "$tmp_dir/$tarball" -C "$tmp_dir" &
+        spinner $! "Extracting..."
+
+        if [[ ! -f "$tmp_dir/$BINARY" ]]; then
+            fail "Archive does not contain expected binary: $BINARY"
+            exit 1
+        fi
+
+        mv "$tmp_dir/$BINARY" "$LOCAL_PATH/$BINARY"
+        chmod +x "$LOCAL_PATH/$BINARY"
+        rm -rf "$tmp_dir"
+        success "Installed $BINARY from tarball to $LOCAL_PATH"
+        return 0
+    fi
+
+    warn "Tarball not found. Falling back to legacy format: $binary_legacy"
+
+    legacy_url=$(curl $curl_args "$RELEASE_URL" \
+        | grep "browser_download_url" \
+        | grep "$binary_legacy" \
+        | cut -d : -f 2,3 \
+        | tr -d \" \
+        | xargs)
+
+    if [[ -z "$legacy_url" ]]; then
+        fail "No binary found for $platform/$arch in either format."
         exit 1
     fi
 
-    tmp_dir=$(mktemp -d)
-    info "Downloading $tarball..."
-    wget $wget_args "$download_url" -O "$tmp_dir/$tarball" &
-    spinner $! "Downloading archive..."
+    info "Downloading legacy binary..."
+    wget $wget_args "$legacy_url" -O "$LOCAL_PATH/$BINARY" &
+    spinner $! "Downloading legacy binary..."
 
-    info "Extracting $tarball..."
-    tar -xf "$tmp_dir/$tarball" -C "$tmp_dir" &
-    spinner $! "Extracting archive..."
-
-    debug "Moving binary to $LOCAL_PATH"
-    mv "$tmp_dir/$BINARY" "$LOCAL_PATH/$BINARY"
     chmod +x "$LOCAL_PATH/$BINARY"
-
-    info "Cleaning up..."
-    rm -rf "$tmp_dir"
-
-    success "Installed $BINARY to $LOCAL_PATH"
+    success "Installed $BINARY from legacy format to $LOCAL_PATH"
 }
 
 enable_debug
