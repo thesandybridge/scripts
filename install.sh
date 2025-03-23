@@ -13,12 +13,12 @@
 set -e
 
 # DEFINE VARIABLES
-grey="\\e[37m"
-blue="\\e[36m"
-red="\\e[31m"
-yellow="\\e[33m"
-green="\\e[32m"
-reset="\\e[0m"
+grey="\e[37m"
+blue="\e[36m"
+red="\e[31m"
+yellow="\e[33m"
+green="\e[32m"
+reset="\e[0m"
 
 GITHUB_USER=thesandybridge
 GITHUB_REPO=$1
