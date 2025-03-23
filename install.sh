@@ -170,12 +170,7 @@ install() {
 
     info "Trying to find asset: $tarball"
 
-    download_url=$(curl $curl_args "$RELEASE_URL" \
-        | grep "browser_download_url" \
-        | grep "$tarball" \
-        | cut -d : -f 2,3 \
-        | tr -d \" \
-        | xargs)
+    download_url=$(curl $curl_args "$RELEASE_URL" | jq -r ".assets[] | select(.name == \"$tarball\") | .browser_download_url")
 
     if [[ -n "$download_url" ]]; then
         tmp_dir=$(mktemp -d)
@@ -201,12 +196,7 @@ install() {
 
     warn "Tarball not found. Falling back to legacy format: $binary_legacy"
 
-    legacy_url=$(curl $curl_args "$RELEASE_URL" \
-        | grep "browser_download_url" \
-        | grep "$binary_legacy" \
-        | cut -d : -f 2,3 \
-        | tr -d \" \
-        | xargs)
+    legacy_url=$(curl $curl_args "$RELEASE_URL" | jq -r ".assets[] | select(.name == \"$binary_legacy\") | .browser_download_url")
 
     if [[ -z "$legacy_url" ]]; then
         fail "No binary found for $platform/$arch in either format."
