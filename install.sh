@@ -148,9 +148,21 @@ install() {
     esac
 
     case "$arch" in
-        x86_64|amd64) arch="x86_64" ;;
-        arm64|aarch64) arch="aarch64" ;;
-        *) fail "Unsupported architecture: $arch"; exit 1 ;;
+        x86_64|amd64)
+            arch="x86_64"
+            ;;
+        arm64|aarch64)
+            if [[ "$platform" == "apple-darwin" ]]; then
+                warn "Apple Silicon detected — falling back to x86_64 binary (Rosetta)"
+                arch="x86_64"
+            else
+                arch="aarch64"
+            fi
+            ;;
+        *)
+            fail "Unsupported architecture: $arch"
+            exit 1
+            ;;
     esac
 
     tarball="${BINARY}-${arch}-${platform}.tar.gz"
