@@ -137,24 +137,59 @@ validate_args() {
 }
 
 install() {
-    debug "Fetching binary from github.com/${GITHUB_USER}/${GITHUB_REPO}..."
-    get_url=$(curl $curl_args $RELEASE_URL \
-        | grep "browser_download_url.*amd64"  \
+    platform="$(uname -s)"
+    arch="$(uname -m)"
+
+    # Normalize platform name
+    case "$platform" in
+        Darwin)   platform="apple-darwin" ;;
+        Linux)    platform="unknown-linux-gnu" ;;
+        MINGW*|MSYS*|CYGWIN*|Windows_NT) platform="pc-windows-msvc" ;;
+        *)        fail "Unsupported platform: $platform"; exit 1 ;;
+    esac
+
+    # Normalize arch name
+    case "$arch" in
+        x86_64|amd64) arch="x86_64" ;;
+        *) fail "Unsupported architecture: $arch"; exit 1 ;;
+    esac
+
+    # Construct expected filename
+    tarball="${BINARY}-${arch}-${platform}.tar.gz"
+
+    info "Expecting asset name: $tarball"
+
+    debug "Fetching release metadata from $RELEASE_URL"
+    get_url=$(curl $curl_args "$RELEASE_URL" \
+        | grep "browser_download_url.*${tarball}" \
         | cut -d : -f 2,3 \
         | tr -d \" \
         | xargs > /tmp/_out ) &
-    spinner $! "Fetching binary from github.com/${GITHUB_USER}/${GITHUB_REPO}..."
+    spinner $! "Resolving download URL for $tarball..."
     download_url=$(</tmp/_out)
 
-    debug "Fetching binary from $download_linux"
-    wget $wget_args $download_url -O $LOCAL_PATH/$BINARY &
-    spinner $! "Downloading binary..."
+    if [[ -z "$download_url" ]]; then
+        fail "Could not find a suitable binary for $platform/$arch"
+        exit 1
+    fi
 
-    debug "Creating executable at $LOCAL_PATH"
-    chmod +x $LOCAL_PATH/$BINARY &
-    spinner $! "Creating executable..."
+    tmp_dir=$(mktemp -d)
+    info "Downloading $tarball..."
+    wget $wget_args "$download_url" -O "$tmp_dir/$tarball" &
+    spinner $! "Downloading archive..."
 
-    success "Success! Binary has been added to $LOCAL_PATH"
+    info "Extracting $tarball..."
+    tar -xf "$tmp_dir/$tarball" -C "$tmp_dir" &
+    spinner $! "Extracting archive..."
+
+    debug "Moving binary to $LOCAL_PATH"
+    mv "$tmp_dir/$BINARY" "$LOCAL_PATH/$BINARY"
+    chmod +x "$LOCAL_PATH/$BINARY"
+
+    info "Cleaning up..."
+    rm -rf "$tmp_dir"
+
+    success "Installed $BINARY to $LOCAL_PATH"
 }
 
 enable_debug
