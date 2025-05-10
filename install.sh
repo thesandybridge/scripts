@@ -44,14 +44,6 @@ function shutdown() {
 }
 trap shutdown EXIT
 
-# Logging, loosely based on http://www.ludovicocaldara.net/dba/bash-tips-4-use-logging-levels/
-info() { echo -e "${blue}[+] $*${reset}"; }
-warn() { echo -e "${yellow}[!] $*${reset}"; }
-error() { echo -e "${red}[E] $*${reset}"; }
-debug() { if [[ "${DEBUG}" == "true" ]]; then echo -e "${grey}[D] $*${reset}"; fi }
-success() { echo -e "${green}[✔] $*${reset}"; }
-fail() { echo -e "${red}[🞨] $*${reset}"; }
-
 curl_args=
 wget_args=
 enable_debug() {
