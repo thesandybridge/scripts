@@ -148,12 +148,12 @@ install() {
         tar -xf "$tmp_dir/$tarball" -C "$tmp_dir" &
         spinner $! "Extracting..."
 
-        if [[ ! -f "$tmp_dir/$BINARY" ]]; then
-            fail "Archive does not contain expected binary: $BINARY"
+        if [[ ! -f "$tmp_dir/$GITHUB_REPO" ]]; then
+            fail "Archive does not contain expected binary: $GITHUB_REPO"
             exit 1
         fi
 
-        mv "$tmp_dir/$BINARY" "$LOCAL_PATH/$BINARY"
+        mv "$tmp_dir/$GITHUB_REPO" "$LOCAL_PATH/$BINARY"
         chmod +x "$LOCAL_PATH/$BINARY"
         rm -rf "$tmp_dir"
         success "Installed $BINARY from tarball to $LOCAL_PATH"
