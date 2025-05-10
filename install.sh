@@ -165,8 +165,8 @@ install() {
             ;;
     esac
 
-    tarball="${BINARY}-${arch}-${platform}.tar.gz"
-    binary_legacy="${BINARY}_amd64"
+    tarball="${GITHUB_REPO}-${arch}-${platform}.tar.gz"
+    binary_legacy="${GITHUB_REPO}_amd64"
 
     info "Trying to find asset: $tarball"
 
